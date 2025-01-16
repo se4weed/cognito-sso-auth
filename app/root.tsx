@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
+import { AuthProvider } from "react-oidc-context";
 
 import "./tailwind.css";
 
@@ -23,20 +24,29 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const cognitoAuthConfig = {
+    authority: process.env.VITE_COGNITO_AUTHORITY,
+    client_id: process.env.VITE_COGNITO_CLIENT_ID,
+    redirect_uri: "https://localhost:5173",
+    response_type: "code",
+    scope: "phone openid email",
+  };
   return (
-    <html lang="ja">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+    <AuthProvider {...cognitoAuthConfig}>
+      <html lang="ja">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </body>
+      </html>
+    </AuthProvider>
   );
 }
 
